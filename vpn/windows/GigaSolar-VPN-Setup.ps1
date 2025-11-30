@@ -1,4 +1,4 @@
-# GigaSolar - VPN profile creator (L2TP/IPsec) - Idempotent
+# GigaSolar - VPN profile creator (L2TP/IPsec) - Idempotent + self-delete
 
 $VpnConnectionName = "GigaSolar VPN"
 $VpnServerAddress  = "he908hzgbe5.sn.mynetname.net"
@@ -6,12 +6,26 @@ $VpnPreSharedKey   = "dP5gEh76FQJeXEQQ"
 $VpnDnsSuffix      = "gigasolar.local"
 $SplitTunneling    = $false
 
+# Percorso dello script (serve per auto-cancellarsi)
+$scriptPath = $MyInvocation.MyCommand.Path
+
+function Remove-LocalScript {
+    if ($scriptPath -and (Test-Path -LiteralPath $scriptPath)) {
+        try {
+            Remove-Item -LiteralPath $scriptPath -Force -ErrorAction SilentlyContinue
+        } catch {
+            # ignora eventuali errori di delete
+        }
+    }
+}
+
 # --- Controllo privilegi amministrativi ---
 $principal = New-Object Security.Principal.WindowsPrincipal(
     [Security.Principal.WindowsIdentity]::GetCurrent()
 )
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Esegui questo script come Amministratore." -ForegroundColor Red
+    Remove-LocalScript
     exit 1
 }
 
@@ -34,6 +48,7 @@ if ($null -ne $existing) {
     } catch {
         Write-Host "Impossibile rimuovere il profilo esistente:" -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Red
+        Remove-LocalScript
         exit 1
     }
 }
@@ -61,5 +76,9 @@ try {
 } catch {
     Write-Host "Errore durante la creazione del profilo VPN:" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
+    Remove-LocalScript
     exit 1
 }
+
+# --- Cancello lo script locale (es. C:\GigaSolar\GigaSolar-VPN-Setup.ps1) ---
+Remove-LocalScript
