@@ -1,4 +1,4 @@
-# GigaSolar - VPN profile creator (L2TP/IPsec) - User only + self-delete (solo PS1)
+# GigaSolar - VPN profile creator (L2TP/IPsec) - User only + self-delete PS1
 
 $VpnConnectionName = "GigaSolar VPN"
 $VpnServerAddress  = "he908hzgbe5.sn.mynetname.net"
@@ -6,10 +6,10 @@ $VpnPreSharedKey   = "dP5gEh76FQJeXEQQ"
 $VpnDnsSuffix      = "gigasolar.local"
 $SplitTunneling    = $false
 
-# Percorso dello script (serve per auto-cancellarsi)
+# Percorso dello script (per auto-cancellarsi)
 $scriptPath = $MyInvocation.MyCommand.Path
 
-function Remove-SelfPs1 {
+function Remove-LocalScript {
     if ($scriptPath -and (Test-Path -LiteralPath $scriptPath)) {
         try { Remove-Item -LiteralPath $scriptPath -Force -ErrorAction SilentlyContinue } catch {}
     }
@@ -34,7 +34,7 @@ if ($null -ne $existing) {
     } catch {
         Write-Host "Impossibile rimuovere il profilo esistente:" -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Red
-        Remove-SelfPs1
+        Remove-LocalScript
         exit 1
     }
 }
@@ -61,9 +61,9 @@ try {
 } catch {
     Write-Host "Errore durante la creazione del profilo VPN:" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
-    Remove-SelfPs1
+    Remove-LocalScript
     exit 1
 }
 
 # --- Cancella solo il file PS1 locale ---
-Remove-SelfPs1
+Remove-LocalScript
