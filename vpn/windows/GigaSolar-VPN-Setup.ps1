@@ -2,7 +2,7 @@
 
 $VpnConnectionName = "GigaSolar VPN"
 $VpnServerAddress  = "he908hzgbe5.sn.mynetname.net"
-$VpnPreSharedKey   = "INSERISCI_PSK_QUI"
+$VpnPreSharedKey   = "dP5gEh76FQJeXEQQ"
 $VpnDnsSuffix      = "gigasolar.local"
 $SplitTunneling    = $false
 
