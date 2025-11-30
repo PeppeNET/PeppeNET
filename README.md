@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/PeppeNET/PeppeNET/main/asset/gigasolar-logo.png" width="260" />
+  <img src="https://raw.githubusercontent.com/PeppeNET/PeppeNET/gigasolar-logo.png" width="260" />
 </p>
 
 
