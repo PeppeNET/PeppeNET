@@ -1,4 +1,4 @@
-# GigaSolar - VPN profile creator (L2TP/IPsec) - Idempotent + self-delete
+# GigaSolar - VPN profile creator (L2TP/IPsec) - User only + self-delete
 
 $VpnConnectionName = "GigaSolar VPN"
 $VpnServerAddress  = "he908hzgbe5.sn.mynetname.net"
@@ -23,24 +23,13 @@ function Remove-LocalScriptAndFolder {
     }
 }
 
-
-# --- Controllo privilegi amministrativi ---
-$principal = New-Object Security.Principal.WindowsPrincipal(
-    [Security.Principal.WindowsIdentity]::GetCurrent()
-)
-if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host "Esegui questo script come Amministratore." -ForegroundColor Red
-    Remove-LocalScript
-    exit 1
-}
-
 Write-Host ""
-Write-Host "GigaSolar - Setup profilo VPN '$VpnConnectionName'" -ForegroundColor Cyan
+Write-Host "GigaSolar - Setup profilo VPN '$VpnConnectionName' (utente corrente)" -ForegroundColor Cyan
 Write-Host ""
 
 # --- Se esiste già il profilo, lo rimuovo (idempotenza) ---
 try {
-    $existing = Get-VpnConnection -Name $VpnConnectionName -AllUserConnection -ErrorAction SilentlyContinue
+    $existing = Get-VpnConnection -Name $VpnConnectionName -ErrorAction SilentlyContinue
 } catch {
     $existing = $null
 }
@@ -48,17 +37,17 @@ try {
 if ($null -ne $existing) {
     Write-Host "Profilo esistente trovato. Lo rimuovo..." -ForegroundColor Yellow
     try {
-        Remove-VpnConnection -Name $VpnConnectionName -AllUserConnection -Force -PassThru | Out-Null
+        Remove-VpnConnection -Name $VpnConnectionName -Force -PassThru | Out-Null
         Write-Host "Profilo precedente rimosso." -ForegroundColor DarkYellow
     } catch {
         Write-Host "Impossibile rimuovere il profilo esistente:" -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Red
-        Remove-LocalScript
+        Remove-LocalScriptAndFolder
         exit 1
     }
 }
 
-# --- Creo il nuovo profilo VPN ---
+# --- Creo il nuovo profilo VPN (solo per questo utente) ---
 $pars = @{
     Name                 = $VpnConnectionName
     ServerAddress        = $VpnServerAddress
@@ -66,7 +55,6 @@ $pars = @{
     L2tpPsk              = $VpnPreSharedKey
     EncryptionLevel      = 'Required'
     AuthenticationMethod = 'MSChapv2'
-    AllUserConnection    = $true
     RememberCredential   = $true
     Force                = $true
 }
@@ -81,9 +69,9 @@ try {
 } catch {
     Write-Host "Errore durante la creazione del profilo VPN:" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
-    Remove-LocalScript
+    Remove-LocalScriptAndFolder
     exit 1
 }
 
-# --- Cancello lo script locale (es. C:\GigaSolar\GigaSolar-VPN-Setup.ps1) ---
+# --- Cancello lo script locale e la cartella se vuota ---
 Remove-LocalScript
