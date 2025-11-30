@@ -6,18 +6,23 @@ $VpnPreSharedKey   = "dP5gEh76FQJeXEQQ"
 $VpnDnsSuffix      = "gigasolar.local"
 $SplitTunneling    = $false
 
-# Percorso dello script (serve per auto-cancellarsi)
+# Percorso dello script e cartella (per auto-cancellarsi)
 $scriptPath = $MyInvocation.MyCommand.Path
+$scriptDir  = Split-Path -Parent $scriptPath
 
-function Remove-LocalScript {
+function Remove-LocalScriptAndFolder {
     if ($scriptPath -and (Test-Path -LiteralPath $scriptPath)) {
+        try { Remove-Item -LiteralPath $scriptPath -Force -ErrorAction SilentlyContinue } catch {}
+    }
+    if ($scriptDir -and (Test-Path -LiteralPath $scriptDir)) {
         try {
-            Remove-Item -LiteralPath $scriptPath -Force -ErrorAction SilentlyContinue
-        } catch {
-            # ignora eventuali errori di delete
-        }
+            if (-not (Get-ChildItem -LiteralPath $scriptDir -Force)) {
+                Remove-Item -LiteralPath $scriptDir -Force -ErrorAction SilentlyContinue
+            }
+        } catch {}
     }
 }
+
 
 # --- Controllo privilegi amministrativi ---
 $principal = New-Object Security.Principal.WindowsPrincipal(
