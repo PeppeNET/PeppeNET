@@ -2,6 +2,8 @@
   <img src="https://raw.githubusercontent.com/PeppeNET/PeppeNET/main/asset/gigasolar-logo.png" width="260" />
 </p>
 
+
+
 <h1 align="center">👋 Hi, I'm Giuseppe Motta</h1>
 <h3 align="center">CTO • Software Architect • Energy Systems Engineer</h3>
 
