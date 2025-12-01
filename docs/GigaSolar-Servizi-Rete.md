@@ -1,6 +1,5 @@
 <p align="left">
   <img src="https://raw.githubusercontent.com/PeppeNET/PeppeNET/main/gigasolar-logo.png" alt="GigaSolar" width="260">
-
 </p>
 
 <h1 align="center">🌐 Servizi interni GigaSolar</h1>
@@ -19,7 +18,7 @@
 - Infrastrutture IT e automazione industriale  
 - Sviluppo software proprietario (AtomSoft, GigaERP-AI)
 
-Questa pagina è dedicata ai **collaboratori interni** che lavorano in **VPN** e devono accedere ai servizi aziendali (NAS, CRM, WordPress, ecc.).
+Questa pagina è dedicata ai **collaboratori interni** che lavorano in **VPN** e devono accedere ai servizi aziendali (NAS, CRM, Nextcloud, WordPress, ecc.).
 
 ---
 
@@ -54,47 +53,148 @@ In caso di problemi con la VPN, contattare il referente IT.
 
 ---
 
-## 🖥️ Server applicativi interni
+## 🖥️ Server applicativi interni (LAN 192.168.14.0/24)
 
-> Gli indirizzi possono essere usati sia per IP diretto che per nome (se il DNS interno è configurato sul PC).
-
-### 1. Sito WordPress GigaSolar (DEV)
-
-- **Nome interno:**  
-  `http://wp-gigasolar.gigasolar.local`
-- **IP diretto (esempio):**  
-  `http://192.168.14.41/`
-- **Uso:**  
-  Sviluppo e test del sito web GigaSolar prima della pubblicazione ufficiale.
+Gli indirizzi possono essere usati sia come **nome DNS interno** (`*.gigasolar.local`)
+sia come **IP diretto**, se il DNS non è risolto correttamente sul PC.
 
 ---
 
-### 2. CRM interno
+### 1. WordPress GigaSolar (DEV)
 
-- **Nome interno:**  
-  `http://crm.gigasolar.local`
-- **IP diretto (esempio):**  
-  `http://192.168.14.42/`
-- **Uso:**  
-  Gestione contatti, lead, opportunità commerciali, attività e follow-up clienti.
+- **DNS interno:** `wp-gigasolar-dev.gigasolar.local`  
+- **IP:** `192.168.14.50`  
+- **Uso:** sviluppo e test del sito web GigaSolar prima della pubblicazione ufficiale.
+
+Accesso tipico (browser, in VPN):
+
+- `http://wp-gigasolar-dev.gigasolar.local`
+- in alternativa: `http://192.168.14.50/`
 
 ---
 
-### 3. Calendario / Groupware
+### 2. CRM interno – SuiteCRM
 
-- **Nome interno:**  
-  `http://calendar.gigasolar.local`
-- **Uso:**  
-  Calendari condivisi, gestione appuntamenti, pianificazione attività interne.
+- **DNS interno:** `crm.gigasolar.local`  
+- **IP:** `192.168.14.41`  
+- **Uso:** CRM principale GigaSolar (clienti, lead, opportunità, attività).
+
+Accesso tipico:
+
+- `http://crm.gigasolar.local`
+- in alternativa: `http://192.168.14.41/`
+
+---
+
+### 3. Nextcloud – File & Calendario
+
+- **DNS file:** `cloud.gigasolar.local`  
+- **DNS calendario (alias stessa VM):** `calendar.gigasolar.local`  
+- **IP:** `192.168.14.42`  
+- **Uso:**
+  - Files: condivisione documenti interni
+  - Calendari: calendario condiviso, agenda e risorse
+
+Accesso tipico:
+
+- `https://cloud.gigasolar.local`  
+- `https://calendar.gigasolar.local`  
+
+*(se inizialmente non è configurato HTTPS, usare `http://`)*
+
+---
+
+### 4. Mail server – Mailcow
+
+- **DNS interno:** `mail.gigasolar.local`  
+- **IP:** `192.168.14.43`  
+- **Uso:** posta interna, webmail, gestione caselle.
+
+Accesso tipico:
+
+- `https://mail.gigasolar.local`
+- in alternativa: `https://192.168.14.43/`
+
+---
+
+### 5. Centralino VoIP – FreePBX
+
+- **DNS interno:** `pbx.gigasolar.local`  
+- **IP:** `192.168.14.44`  
+- **Uso:** centralino telefonico, gestione interni, trunk, code di chiamata.
+
+Accesso tipico:
+
+- `http://pbx.gigasolar.local`
+- in alternativa: `http://192.168.14.44/`
+
+---
+
+### 6. Helpdesk – UVdesk
+
+- **DNS interno:** `help.gigasolar.local`  
+- **IP:** `192.168.14.45`  
+- **Uso:** sistema di ticketing per supporto interno/esterno.
+
+Accesso tipico:
+
+- `http://help.gigasolar.local`
+- in alternativa: `http://192.168.14.45/`
+
+---
+
+### 7. MariaDB (backend LAMP)
+
+- **DNS interno:** `db.gigasolar.local`  
+- **IP:** `192.168.14.46`  
+- **Uso:** database per applicazioni LAMP interne (es. SuiteCRM, ecc.).
+
+Parametri tipici di connessione (da host autorizzati):
+
+- Host: `db.gigasolar.local`  
+- Porta: `3306`
+
+---
+
+### 8. SQL Server – GigaERP / AtomSoft / GigaSolar
+
+- **DNS interno:** `sql.gigasolar.local`  
+- **IP:** `192.168.14.75`  
+- **Uso:** database principale per GigaERP-AI, AtomSoft, GigaSolar Admin Console, ecc.
+
+Connessione tipica:
+
+- Server: `sql.gigasolar.local`  
+- Porta: `1433`
+
+---
+
+### 9. EspoCRM / Reverse Proxy (in evoluzione)
+
+- **DNS interno:** `espcrm.gigasolar.local`  
+- **IP:** `192.168.14.40`  
+- **Uso attuale / futuro:**  
+  - EspoCRM di test  
+  - futura VM Reverse Proxy (Nginx) che esporrà i servizi pubblici:
+    - `crm.gigasolar.it`
+    - `cloud.gigasolar.it`
+    - `mail.gigasolar.it`
+    - `pbx.gigasolar.it`
+    - `help.gigasolar.it`
 
 ---
 
 ## 🧭 Suggerimenti operativi
 
-- Se l’indirizzo tipo `nome.gigasolar.local` **non funziona**, provare prima con l’**IP diretto** indicato.  
+- Se un indirizzo tipo `nome.gigasolar.local` **non funziona**:
+  - verificare che il PC usi il DNS interno (via VPN),
+  - provare con l’IP diretto indicato nella relativa sezione.
+
 - Se non si riesce ad aprire una share (`\\192.168.10.70\social` ecc.):
-  - Verificare di essere **connessi alla VPN**
-  - Verificare di avere i **permessi** sulla cartella (contattare amministrazione IT)
+  - verificare di essere **connessi alla VPN**,
+  - verificare i **permessi** sul NAS (utente/gruppo dominio),
+  - contattare l’amministrazione IT in caso di accesso negato.
+
 - Non salvare file personali sul NAS: usare solo per attività legate a GigaSolar.
 
 ---
@@ -119,4 +219,4 @@ In caso di problemi con la VPN, contattare il referente IT.
 Questa pagina viene aggiornata dall’area IT GigaSolar.  
 In caso di nuovi servizi (nuove VM, nuovi applicativi, nuovi share NAS), verranno aggiunti qui senza richiedere alcuna modifica ai PC dei dipendenti.
 
-> **Suggerimento:** tieni sempre a portata il collegamento “Servizi-GigaSolar” sul Desktop, creato automaticamente dallo script di installazione VPN.
+> **Suggerimento:** tieni sempre a portata il collegamento **“Servizi-GigaSolar”** sul Desktop, creato automaticamente dallo script di installazione VPN.
